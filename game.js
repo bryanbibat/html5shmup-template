@@ -12,9 +12,7 @@ BasicGame.Game.prototype = {
   },
 
   update: function () {
-
     //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
-
   },
 
   quitGame: function (pointer) {

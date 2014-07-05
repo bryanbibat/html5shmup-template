@@ -1,0 +1,24 @@
+doctype
+html
+head
+  meta(charset='utf-8')
+  meta(name='viewport', content='width=device-width, initial-scale=1')
+
+  meta(property="og:title", content=properties.title)
+  meta(property="og:description", content=properties.description)
+
+  link(rel='stylesheet', href='style/index.css')
+  link(rel='shortcut icon', href='images/favicon.ico')
+
+  title=properties.title
+
+  script(src="js/app.min.js")
+
+  // include analytics.jade
+
+body
+  #gameContainer
+
+  if (!productionBuild)
+    script.
+      document.write('<script src="//' + window.location.hostname + ':#{properties.liveReloadPort}/livereload.js"><\/script>')

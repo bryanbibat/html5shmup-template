@@ -7,6 +7,9 @@ BasicGame.MainMenu = function (game) {
 };
 
 BasicGame.MainMenu.prototype = {
+  preload: function () {
+    this.load.image('titlepage', 'assets/titlepage.png');
+  },
 
   create: function () {
 

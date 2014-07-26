@@ -12,6 +12,6 @@ window.onload = function() {
   game.state.add('Game', BasicGame.Game);
 
   //  Now start the Boot state.
-  game.state.start('Game');
+  game.state.start('Boot');
 
 };

@@ -14,7 +14,6 @@ BasicGame.Game.prototype = {
     this.setupExplosions();
     this.setupPlayerIcons();
     this.setupText();
-    this.setupAudio();
 
     this.cursors = this.input.keyboard.createCursorKeys();
   },
@@ -204,14 +203,6 @@ BasicGame.Game.prototype = {
     this.scoreText.anchor.setTo(0.5, 0.5);
   },
 
-  setupAudio: function () {
-    this.explosionSFX = this.add.audio('explosion');
-    this.playerExplosionSFX = this.add.audio('playerExplosion');
-    this.enemyFireSFX = this.add.audio('enemyFire');
-    this.playerFireSFX = this.add.audio('playerFire');
-    this.powerUpSFX = this.add.audio('powerUp');
-  },
-
   // update()-related functions
 
   checkCollisions: function () {
@@ -289,7 +280,6 @@ BasicGame.Game.prototype = {
         bullet.reset(enemy.x, enemy.y);
         this.physics.arcade.moveToObject(bullet, this.player, 150);
         enemy.nextShotAt = this.time.now + this.shooterShotDelay;
-        this.enemyFireSFX.play();
       }
     }, this);
 
@@ -298,7 +288,6 @@ BasicGame.Game.prototype = {
         this.enemyBulletPool.countDead() > 9) {
 
       this.boss.nextShotAt = this.time.now + 1000;
-      this.enemyFireSFX.play();
 
       for (var i = 0; i < 5; i++) {
         // process 2 bullets at a time
@@ -402,8 +391,6 @@ BasicGame.Game.prototype = {
       return;
     }
 
-    this.playerExplosionSFX.play();
-
     // crashing into an enemy only deals 5 damage
     this.damageEnemy(enemy, 5);
     var life = this.lives.getFirstAlive();
@@ -425,7 +412,6 @@ BasicGame.Game.prototype = {
       enemy.play('hit');
     } else {
       this.explode(enemy);
-      this.explosionSFX.play();
       this.spawnPowerUp(enemy);
       this.addToScore(enemy.reward);
       if (enemy.key === 'boss') {
@@ -450,7 +436,6 @@ BasicGame.Game.prototype = {
   playerPowerUp: function (player, powerUp) {
     this.addToScore(powerUp.reward);
     powerUp.kill();
-    this.powerUpSFX.play();
     if (this.weaponLevel < 5) {
       this.weaponLevel++;
     }
@@ -510,7 +495,6 @@ BasicGame.Game.prototype = {
     }
 
     this.nextShotAt = this.time.now + this.shotDelay;
-    this.playerFireSFX.play();
 
     var bullet;
     if (this.weaponLevel === 0) {

@@ -15,8 +15,8 @@ BasicGame.Preloader.prototype = {
     //  Show the loading progress bar asset we loaded in boot.js
     this.stage.backgroundColor = '#2d2d2d';
 
-    this.preloadBar = this.add.sprite(412, 400, 'preloaderBar');
-    this.add.text(510, 360, "Loading...", { font: "32px monospace", fill: "#fff" }).anchor.setTo(0.5, 0.5);
+    this.preloadBar = this.add.sprite(this.game.width / 2 - 100, this.game.height / 2, 'preloaderBar');
+    this.add.text(this.game.width / 2, this.game.height / 2 - 30, "Loading...", { font: "32px monospace", fill: "#fff" }).anchor.setTo(0.5, 0.5);
 
     //  This sets the preloadBar sprite as a loader sprite.
     //  What that does is automatically crop the sprite from 0 to full-width
@@ -34,11 +34,11 @@ BasicGame.Preloader.prototype = {
     this.load.spritesheet('boss', '<%= image_path 'boss.png' %>', 93, 75);
     this.load.spritesheet('explosion', '<%= image_path 'explosion.png' %>', 32, 32);
     this.load.spritesheet('player', '<%= image_path 'player.png' %>', 64, 64);
-    this.load.audio('explosion', ['<%= asset_path 'explosion', type: 'wav'%>']);
-    this.load.audio('playerExplosion', ['<%= asset_path 'player-explosion', type: 'wav' %>']);
-    this.load.audio('enemyFire', ['<%= asset_path 'enemy-fire', type: 'wav' %>']);
-    this.load.audio('playerFire', ['<%= asset_path 'player-fire', type: 'wav' %>']);
-    this.load.audio('powerUp', ['<%= asset_path 'powerup', type: 'wav' %>']);
+    this.load.audio('explosion', ['<%= asset_path 'explosion', type: 'ogg'%>', '<%= asset_path 'explosion', type: 'wav'%>']);
+    this.load.audio('playerExplosion', ['<%= asset_path 'player-explosion', type: 'ogg' %>', '<%= asset_path 'player-explosion', type: 'wav' %>']);
+    this.load.audio('enemyFire', ['<%= asset_path 'enemy-fire', type: 'ogg' %>', '<%= asset_path 'enemy-fire', type: 'wav' %>']);
+    this.load.audio('playerFire', ['<%= asset_path 'player-fire', type: 'ogg' %>', '<%= asset_path 'player-fire', type: 'wav' %>']);
+    this.load.audio('powerUp', ['<%= asset_path 'powerup', type: 'ogg' %>', '<%= asset_path 'powerup', type: 'wav' %>']);
     //this.load.audio('titleMusic', ['audio/main_menu.mp3']);
     //  + lots of other required assets here
 

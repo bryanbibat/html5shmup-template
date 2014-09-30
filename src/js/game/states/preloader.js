@@ -15,8 +15,8 @@
       //  Show the loading progress bar asset we loaded in boot.js
       this.stage.backgroundColor = '#2d2d2d';
 
-      this.preloadBar = this.add.sprite(412, 400, 'preloaderBar');
-      this.add.text(510, 360, "Loading...", { font: "32px monospace", fill: "#fff" }).anchor.setTo(0.5, 0.5);
+    this.preloadBar = this.add.sprite(this.game.width / 2 - 100, this.game.height / 2, 'preloaderBar');
+    this.add.text(this.game.width / 2, this.game.height / 2 - 30, "Loading...", { font: "32px monospace", fill: "#fff" }).anchor.setTo(0.5, 0.5);
 
       //  This sets the preloadBar sprite as a loader sprite.
       //  What that does is automatically crop the sprite from 0 to full-width
@@ -34,11 +34,11 @@
       this.load.spritesheet('boss', 'images/boss.png#grunt-cache-bust', 93, 75);
       this.load.spritesheet('explosion', 'images/explosion.png#grunt-cache-bust', 32, 32);
       this.load.spritesheet('player', 'images/player.png#grunt-cache-bust', 64, 64);
-      this.load.audio('explosion', ['audio/explosion.wav']);
-      this.load.audio('playerExplosion', ['audio/player-explosion.wav']);
-      this.load.audio('enemyFire', ['audio/enemy-fire.wav']);
-      this.load.audio('playerFire', ['audio/player-fire.wav']);
-      this.load.audio('powerUp', ['audio/powerup.wav']);
+      this.load.audio('explosion', ['assets/explosion.ogg', 'assets/explosion.wav']);
+      this.load.audio('playerExplosion', ['assets/player-explosion.ogg', 'assets/player-explosion.wav']);
+      this.load.audio('enemyFire', ['assets/enemy-fire.ogg', 'assets/enemy-fire.wav']);
+      this.load.audio('playerFire', ['assets/player-fire.ogg', 'assets/player-fire.wav']);
+      this.load.audio('powerUp', ['assets/powerup.ogg', 'assets/powerup.wav']);
       //this.load.audio('titleMusic', ['audio/main_menu.mp3']);
       //  + lots of other required assets here
 

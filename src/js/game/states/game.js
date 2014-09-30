@@ -7,7 +7,7 @@
 
     create: function () {
 
-      this.sea = this.add.tileSprite(0, 0, 1024, 768, 'sea');
+      this.sea = this.add.tileSprite(0, 0, 800, 600, 'sea');
 
     },
 

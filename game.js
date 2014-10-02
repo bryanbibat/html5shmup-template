@@ -4,6 +4,9 @@ BasicGame.Game = function (game) {
 };
 
 BasicGame.Game.prototype = {
+  preload: function () {
+    this.load.image('sea', 'assets/sea.png');
+  },
 
   create: function () {
 
@@ -12,7 +15,7 @@ BasicGame.Game.prototype = {
   },
 
   update: function () {
-    //  Honestly, just about anything could go here. It's YOUR game after all. Eat your heart out!
+    this.sea.tilePosition.y += 0.2;
   },
 
   quitGame: function (pointer) {

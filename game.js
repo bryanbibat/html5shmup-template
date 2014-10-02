@@ -11,6 +11,7 @@ BasicGame.Game.prototype = {
     this.load.image('powerup1', 'assets/powerup1.png');
     this.load.spritesheet('greenEnemy', 'assets/enemy.png', 32, 32);
     this.load.spritesheet('whiteEnemy', 'assets/shooting-enemy.png', 32, 32);
+    this.load.spritesheet('boss', 'assets/boss.png', 93, 75);
     this.load.spritesheet('explosion', 'assets/explosion.png', 32, 32);
     this.load.spritesheet('player', 'assets/player.png', 64, 64);
   },
@@ -113,6 +114,31 @@ BasicGame.Game.prototype = {
     // start spawning 5 seconds into the game
     this.nextShooterAt = this.time.now + Phaser.Timer.SECOND * 5;
     this.shooterDelay = BasicGame.SPAWN_SHOOTER_DELAY;
+
+    this.bossPool = this.add.group();
+    this.bossPool.enableBody = true;
+    this.bossPool.physicsBodyType = Phaser.Physics.ARCADE;
+    this.bossPool.createMultiple(1, 'boss');
+    this.bossPool.setAll('anchor.x', 0.5);
+    this.bossPool.setAll('anchor.y', 0.5);
+    this.bossPool.setAll('outOfBoundsKill', true);
+    this.bossPool.setAll('checkWorldBounds', true);
+    this.bossPool.setAll('reward', BasicGame.BOSS_REWARD, false, false, 0, true);
+    this.bossPool.setAll(
+      'dropRate', BasicGame.BOSS_DROP_RATE, false, false, 0, true
+    );
+
+    // Set the animation for each sprite
+    this.bossPool.forEach(function (enemy) {
+      enemy.animations.add('fly', [ 0, 1, 2 ], 20, true);
+      enemy.animations.add('hit', [ 3, 1, 3, 2 ], 20, false);
+      enemy.events.onAnimationComplete.add( function (e) {
+        e.play('fly');
+      }, this);
+    });
+
+    this.boss = this.bossPool.getTop();
+    this.bossApproaching = false;
   },
 
   setupBullets: function () {
@@ -231,6 +257,16 @@ BasicGame.Game.prototype = {
     this.physics.arcade.overlap(
       this.player, this.powerUpPool, this.playerPowerUp, null, this
     );
+
+    if (this.bossApproaching === false) {
+      this.physics.arcade.overlap(
+        this.bulletPool, this.bossPool, this.enemyHit, null, this
+      );
+
+      this.physics.arcade.overlap(
+        this.player, this.bossPool, this.playerHit, null, this
+      );
+    }
   },
 
   spawnEnemies: function () {
@@ -288,6 +324,41 @@ BasicGame.Game.prototype = {
         enemy.nextShotAt = this.time.now + BasicGame.SHOOTER_SHOT_DELAY;
       }
     }, this);
+
+    if (this.bossApproaching === false && this.boss.alive && 
+        this.boss.nextShotAt < this.time.now &&
+        this.enemyBulletPool.countDead() >= 10) {
+
+      this.boss.nextShotAt = this.time.now + BasicGame.BOSS_SHOT_DELAY;
+
+      for (var i = 0; i < 5; i++) {
+        // process 2 bullets at a time
+        var leftBullet = this.enemyBulletPool.getFirstExists(false);
+        leftBullet.reset(this.boss.x - 10 - i * 10, this.boss.y + 20);
+        var rightBullet = this.enemyBulletPool.getFirstExists(false);
+        rightBullet.reset(this.boss.x + 10 + i * 10, this.boss.y + 20);
+
+        if (this.boss.health > 250) {
+          // aim directly at the player
+          this.physics.arcade.moveToObject(
+            leftBullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY
+          );
+          this.physics.arcade.moveToObject(
+            rightBullet, this.player, BasicGame.ENEMY_BULLET_VELOCITY
+          );
+        } else {
+          // aim slightly off center of the player
+          this.physics.arcade.moveToXY(
+            leftBullet, this.player.x - i * 100, this.player.y,
+            BasicGame.ENEMY_BULLET_VELOCITY
+          );
+          this.physics.arcade.moveToXY(
+            rightBullet, this.player.x + i * 100, this.player.y,
+            BasicGame.ENEMY_BULLET_VELOCITY
+          );
+        }
+      }
+    }
   },
 
   processPlayerInput: function () {
@@ -340,6 +411,17 @@ BasicGame.Game.prototype = {
       this.returnText.anchor.setTo(0.5, 0.5);
       this.showReturn = false;
     }
+
+    if (this.bossApproaching && this.boss.y > 80) {
+      this.bossApproaching = false;
+      this.boss.nextShotAt = 0;
+
+      this.boss.body.velocity.y = 0;
+      this.boss.body.velocity.x = BasicGame.BOSS_X_VELOCITY;
+      // allow bouncing off world bounds
+      this.boss.body.bounce.x = 1;
+      this.boss.body.collideWorldBounds = true;
+    }
   },
 
   enemyHit: function (bullet, enemy) {
@@ -375,17 +457,24 @@ BasicGame.Game.prototype = {
       this.explode(enemy);
       this.spawnPowerUp(enemy);
       this.addToScore(enemy.reward);
+      // We check the sprite key (e.g. 'greenEnemy') to see if the sprite is a boss
+      // For full games, it would be better to set flags on the sprites themselves
+      if (enemy.key === 'boss') {
+        this.enemyPool.destroy();
+        this.shooterPool.destroy();
+        this.bossPool.destroy();
+        this.enemyBulletPool.destroy();
+        this.displayEnd(true);
+      }
     }
   },
 
   addToScore: function (score) {
     this.score += score;
     this.scoreText.text = this.score;
-    if (this.score >= 20000) {
-      this.enemyPool.destroy();
-      this.shooterPool.destroy();
-      this.enemyBulletPool.destroy();
-      this.displayEnd(true);
+    // this approach prevents the boss from spawning again upon winning
+    if (this.score >= 20000 && this.bossPool.countDead() == 1) {
+      this.spawnBoss();
     }
   },
 
@@ -435,6 +524,14 @@ BasicGame.Game.prototype = {
       powerUp.reset(enemy.x, enemy.y);
       powerUp.body.velocity.y = BasicGame.POWERUP_VELOCITY;
     }
+  },
+
+  spawnBoss: function () {
+    this.bossApproaching = true;
+    this.boss.reset(this.game.width / 2, 0, BasicGame.BOSS_HEALTH);
+    this.physics.enable(this.boss, Phaser.Physics.ARCADE);
+    this.boss.body.velocity.y = BasicGame.BOSS_Y_VELOCITY;
+    this.boss.play('fly');
   },
 
   fire: function() {

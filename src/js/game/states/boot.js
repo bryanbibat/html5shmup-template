@@ -33,7 +33,6 @@
       }
       this.scale.pageAlignHorizontally = true;
       this.scale.pageAlignVertically = true;
-      this.scale.setScreenSize(true);
 
       this.addStats();
 

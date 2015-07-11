@@ -91,7 +91,7 @@ module.exports = function (grunt) {
         options: {
           transform: ['browserify-shim'],
           watch: true,
-          bundleOptions: {
+          browserifyOptions: {
             debug: !productionBuild
           }
         }
